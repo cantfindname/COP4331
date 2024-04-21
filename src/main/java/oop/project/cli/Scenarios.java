@@ -31,66 +31,47 @@ public class Scenarios {
         };
     }
 
-    /**
-     * Takes two positional arguments:
-     *  - {@code left: <your integer type>}
-     *  - {@code right: <your integer type>}
-     */
     private static Map<String, Object> add(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int left = 0; //or BigInteger, etc.
-        int right = 0;
+        var split = arguments.split(" ");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("add command requires two arguments: left and right");
+        }
+        int left = Integer.parseInt(split[0]);
+        int right = Integer.parseInt(split[1]);
         return Map.of("left", left, "right", right);
     }
 
-    /**
-     * Takes two <em>named</em> arguments:
-     *  - {@code left: <your decimal type>} (optional)
-     *     - If your project supports default arguments, you could also parse
-     *       this as a non-optional decimal value using a default of 0.0.
-     *  - {@code right: <your decimal type>} (required)
-     */
     static Map<String, Object> sub(String arguments) {
-        //TODO: Parse arguments and extract values.
-        Optional<Double> left = Optional.empty();
-        double right = 0.0;
+        var split = arguments.split(" ");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("sub command requires two arguments: left and right");
+        }
+        double left = split[0].isEmpty() ? 0.0 : Double.parseDouble(split[0]);
+        double right = Double.parseDouble(split[1]);
         return Map.of("left", left, "right", right);
     }
 
-    /**
-     * Takes one positional argument:
-     *  - {@code number: <your integer type>} where {@code number >= 0}
-     */
     static Map<String, Object> sqrt(String arguments) {
-        //TODO: Parse arguments and extract values.
-        int number = 0;
+        int number = Integer.parseInt(arguments);
+        if (number < 0) {
+            throw new IllegalArgumentException("sqrt command requires a non-negative integer argument");
+        }
         return Map.of("number", number);
     }
 
-    /**
-     * Takes one positional argument:
-     *  - {@code subcommand: "add" | "div" | "sqrt" }, aka one of these values.
-     *     - Note: Not all projects support subcommands, but if yours does you
-     *       may want to take advantage of this scenario for that.
-     */
     static Map<String, Object> calc(String arguments) {
-        //TODO: Parse arguments and extract values.
-        String subcommand = "";
-        return Map.of("subcommand", subcommand);
+        if (!Arrays.asList("add", "sub", "sqrt").contains(arguments)) {
+            throw new IllegalArgumentException("calc command requires one of the subcommands: add, sub, sqrt");
+        }
+        return Map.of("subcommand", arguments);
     }
 
-    /**
-     * Takes one positional argument:
-     *  - {@code date: Date}, a custom type representing a {@code LocalDate}
-     *    object (say at least yyyy-mm-dd, or whatever you prefer).
-     *     - Note: Consider this a type that CANNOT be supported by your library
-     *       out of the box and requires a custom type to be defined.
-     */
     static Map<String, Object> date(String arguments) {
-        //TODO: Parse arguments and extract values.
-        LocalDate date = LocalDate.EPOCH;
+        // Parse date from arguments assuming it's in the format yyyy-MM-dd
+        LocalDate date = LocalDate.parse(arguments);
         return Map.of("date", date);
     }
+
 
     //TODO: Add your own scenarios based on your software design writeup. You
     //should have a couple from pain points at least, and likely some others
