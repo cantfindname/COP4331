@@ -1,8 +1,11 @@
 package oop.project.cli;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
-
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Map;
 public class Scenarios {
 
     /**
@@ -24,6 +27,7 @@ public class Scenarios {
             case "date" -> date(arguments);
             case "mul" -> multiply(arguments);
             case "div" -> divide(arguments);
+            case "time" -> time(arguments);
 
             default -> throw new IllegalArgumentException("Unknown command.");
         };
@@ -93,14 +97,19 @@ public class Scenarios {
     }
 
     /**
-     * Parses a string argument into a LocalDate object and returns it as a map.
+     * Parses a date string in the format yyyy-MM-dd and returns a map containing the parsed date.
      *
-     * @param arguments A string representing a date.
-     * @return A map containing the parsed date.
+     * @param arguments A string representing the date to parse.
+     * @return A map containing the parsed date as the "date" key.
+     * @throws IllegalArgumentException if the date is in an invalid format.
      */
     static Map<String, Object> date(String arguments) {
-        LocalDate date = LocalDate.parse(arguments);
-        return Map.of("date", date);
+        try {
+            LocalDate date = LocalDate.parse(arguments);
+            return Map.of("date", date);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Date must be in the format yyyy-MM-dd", e);
+        }
     }
 
     /**
@@ -137,5 +146,32 @@ public class Scenarios {
         double left = Double.parseDouble(split[0]);
         double right = Double.parseDouble(split[1]);
         return Map.of("multiplicand", left, "multiplier", right);
+    }
+
+    /**
+     * Parses a time string in the format HH:mm:ss and returns a map containing the parsed time.
+     *
+     * @param timeString A string representing the time to parse.
+     * @return A map containing the parsed time as the "time" key.
+     * @throws IllegalArgumentException if the time is in an invalid format.
+     */
+    static Map<String, Object> time(String timeString) {
+        if (!isValidTimeFormat(timeString)) {
+            throw new IllegalArgumentException("Invalid time format. Time must be in the format HH:mm:ss");
+        }
+        LocalTime time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm:ss"));
+        return Map.of("time", time);
+    }
+
+    /**
+     * Checks if the given time string is in a valid format.
+     *
+     * @param timeString A string representing the time in the format HH:mm:ss.
+     * @return true if the time string is in the valid format, false otherwise.
+     */
+    static boolean isValidTimeFormat(String timeString) {
+        String expectedFormat = "\\d{2}:\\d{2}:\\d{2}";
+
+        return timeString.matches(expectedFormat);
     }
 }
