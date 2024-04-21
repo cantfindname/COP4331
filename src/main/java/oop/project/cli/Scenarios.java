@@ -28,6 +28,8 @@ public class Scenarios {
             case "mul" -> multiply(arguments);
             case "div" -> divide(arguments);
             case "time" -> time(arguments);
+            case "pow" -> power(arguments);
+            case "fact" -> factorial(arguments);
 
             default -> throw new IllegalArgumentException("Unknown command.");
         };
@@ -173,5 +175,49 @@ public class Scenarios {
         String expectedFormat = "\\d{2}:\\d{2}:\\d{2}";
 
         return timeString.matches(expectedFormat);
+    }
+
+    /**
+     * Method to calculate the power of a number.
+     *
+     * @param arguments A string containing two numbers separated by a space.
+     * @return A map containing the base and exponent.
+     * @throws IllegalArgumentException if the number of arguments is not two or if the exponent is negative.
+     */
+    static Map<String, Object> power(String arguments) {
+        var split = arguments.split(" ");
+        if (split.length != 2) {
+            throw new IllegalArgumentException("power command requires two arguments: base and exponent");
+        }
+        double base = Double.parseDouble(split[0]);
+        int exponent = Integer.parseInt(split[1]);
+        if (exponent < 0) {
+            throw new IllegalArgumentException("exponent cannot be negative for power calculation");
+        }
+        return Map.of("base", base, "exponent", exponent);
+    }
+
+    /**
+     * Method to calculate the factorial of a number.
+     *
+     * @param arguments A string containing a number.
+     * @return A map containing the number and its factorial.
+     * @throws IllegalArgumentException if the number is negative.
+     */
+    static Map<String, Object> factorial(String arguments) {
+        int number;
+        try {
+            number = Integer.parseInt(arguments);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("factorial command requires a valid integer argument");
+        }
+        if (number < 0) {
+            throw new IllegalArgumentException("factorial command requires a non-negative integer argument");
+        }
+        long factorial = 1;
+        for (int i = 2; i <= number; i++) {
+            factorial *= i;
+        }
+        return Map.of("number", number, "factorial", factorial);
     }
 }
