@@ -109,8 +109,13 @@ public class ScenariosTests {
 
         public static Stream<Arguments> testDate() {
             return Stream.of(
-                Arguments.of("Date", "date 2024-01-01", Map.of("date", LocalDate.of(2024, 1, 1))),
-                Arguments.of("Invalid", "date 20240401", null)
+                    Arguments.of("Valid date format", "date 2024-01-01", Map.of("date", LocalDate.of(2024, 1, 1))),
+                    Arguments.of("Invalid date format", "date 20240401", null),
+                    Arguments.of("Date with invalid year", "date 202x-01-01", null),
+                    Arguments.of("Date with invalid month", "date 2024-13-01", null),
+                    Arguments.of("Date with invalid day", "date 2024-02-30", null),
+                    Arguments.of("Date with additional spaces", "date   2024-01-01   ", Map.of("date", LocalDate.of(2024, 1, 1))),
+                    Arguments.of("Date with leading/trailing spaces", "   date 2024-01-01   ", Map.of("date", LocalDate.of(2024, 1, 1)))
             );
         }
 
@@ -172,8 +177,16 @@ public class ScenariosTests {
         }
 
         public static Stream<Arguments> testTime() {
-            return Stream.of(); //TODO
-        };
+            return Stream.of(
+                    Arguments.of("Valid time format", "time 12:00:00", Map.of("time", LocalTime.of(12, 0, 0))),
+                    Arguments.of("Invalid time format", "time 12:00", null),
+                    Arguments.of("Time with invalid hour", "time 25:00:00", null),
+                    Arguments.of("Time with invalid minute", "time 12:60:00", null),
+                    Arguments.of("Time with invalid second", "time 12:00:60", null),
+                    Arguments.of("Time with additional spaces", "time   12:00:00   ", Map.of("time", LocalTime.of(12, 0, 0))),
+                    Arguments.of("Time with leading/trailing spaces", "   time 12:00:00   ", Map.of("time", LocalTime.of(12, 0, 0)))
+            );
+        }
     }
 
     @Nested
