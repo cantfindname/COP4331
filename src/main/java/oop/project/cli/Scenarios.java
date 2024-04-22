@@ -6,6 +6,8 @@ import java.util.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 public class Scenarios {
 
     /**
@@ -50,7 +52,7 @@ public class Scenarios {
         }
         int left = Integer.parseInt(split[0]);
         int right = Integer.parseInt(split[1]);
-        return Map.of("augend", left, "addend", right);
+        return Map.of("left", left, "right", right);
     }
     /**
      * Method to subtract two numbers.
@@ -60,13 +62,28 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two.
      */
     static Map<String, Object> sub(String arguments) {
-        var split = arguments.split(" ");
-        if (split.length != 2) {
-            throw new IllegalArgumentException("sub command requires two arguments: minuend and subtrahend");
+        Pattern pattern = Pattern.compile("--left\\s(\\d+(\\.\\d+)?)\\s*?--right\\s(\\d+(\\.\\d+)?)?");
+        Matcher matcher = pattern.matcher(arguments);
+        Map<String, Object> resultMap = new HashMap<>();
+
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Invalid arguments"); // still need to fix issue with only right val
         }
-        double left = split[0].isEmpty() ? 0.0 : Double.parseDouble(split[0]);
-        double right = Double.parseDouble(split[1]);
-        return Map.of("minuend", left, "subtrahend", right);
+
+        String leftGroup = matcher.group(1);
+        String rightGroup = matcher.group(3);
+
+        if (leftGroup != null) {
+            resultMap.put("left", Double.parseDouble(leftGroup));
+        } else {
+            resultMap.put("left", Optional.empty());
+        }
+
+        if (rightGroup != null) {
+            resultMap.put("right", Double.parseDouble(rightGroup));
+        }
+
+        return resultMap;
     }
 
     /**
