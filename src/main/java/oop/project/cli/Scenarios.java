@@ -62,18 +62,22 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two.
      */
     static Map<String, Object> sub(String arguments) {
-        Pattern pattern = Pattern.compile("--left\\s(\\d+(\\.\\d+)?)\\s*?--right\\s(\\d+(\\.\\d+)?)?");
-        Matcher matcher = pattern.matcher(arguments);
+        Pattern leftPattern = Pattern.compile("--left\\s(\\d+(\\.\\d+)?)");
+        Pattern rightPattern = Pattern.compile("--right\\s(\\d+(\\.\\d+)?$)");
+
+        Matcher leftMatcher = leftPattern.matcher(arguments);
+        Matcher rightMatcher = rightPattern.matcher(arguments);
+
         Map<String, Object> resultMap = new HashMap<>();
 
-        if (!matcher.find()) {
-            throw new IllegalArgumentException("Invalid arguments"); // still need to fix issue with only right val
+        if (!rightMatcher.find()){
+            throw new IllegalArgumentException("Invalid arguments");
         }
+        String rightGroup = rightMatcher.group(1);
 
-        String leftGroup = matcher.group(1);
-        String rightGroup = matcher.group(3);
 
-        if (leftGroup != null) {
+        if (leftMatcher.find()) {
+            String leftGroup = leftMatcher.group(1);
             resultMap.put("left", Double.parseDouble(leftGroup));
         } else {
             resultMap.put("left", Optional.empty());
@@ -82,7 +86,11 @@ public class Scenarios {
         if (rightGroup != null) {
             resultMap.put("right", Double.parseDouble(rightGroup));
         }
+        else {
+            resultMap.put("right", Optional.empty());
+        }
 
+        System.out.println(resultMap);
         return resultMap;
     }
 
