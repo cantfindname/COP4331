@@ -134,7 +134,8 @@ public class ScenariosTests {
                     Arguments.of("Negative Divisor", "div 10 -2", Map.of("dividend", 10.0, "divisor", -2.0)),
                     Arguments.of("Not A Number", "div two 3", null),
                     Arguments.of("Missing Argument", "div 5", null),
-                    Arguments.of("Extraneous Argument", "div 5 3 2", null)
+                    Arguments.of("Extraneous Argument", "div 5 3 2", null),
+                    Arguments.of("Floating Point", "mul 2.5 3", Map.of("multiplicand", 2.5, "multiplier", 3.0))
             );
         };
     }
