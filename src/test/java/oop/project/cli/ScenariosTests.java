@@ -170,7 +170,12 @@ public class ScenariosTests {
         }
 
         public static Stream<Arguments> testPower() {
-            return Stream.of(); //TODO
+            return Stream.of(
+                    Arguments.of("Valid", "pow 2 3", Map.of("base", 2.0, "exponent", 3)),
+                    Arguments.of("Zero Exponent", "pow 5 0", Map.of("base", 5.0, "exponent", 0)),
+                    Arguments.of("Negative Exponent", "pow 3 -2", null),
+                    Arguments.of("Not A Number", "pow two 3", null)
+            );
         };
     }
 
@@ -184,7 +189,12 @@ public class ScenariosTests {
         }
 
         public static Stream<Arguments> testFactorial() {
-            return Stream.of(); //TODO
+            return Stream.of(
+                    Arguments.of("Valid", "fact 5", Map.of("number", 5, "factorial", 120L)),
+                    Arguments.of("Zero", "fact 0", Map.of("number", 0, "factorial", 1L)),
+                    Arguments.of("Negative", "fact -1", null),
+                    Arguments.of("Not An Integer", "fact one", null)
+            );
         };
     }
 
