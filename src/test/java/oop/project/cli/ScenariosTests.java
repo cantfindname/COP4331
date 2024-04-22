@@ -127,7 +127,15 @@ public class ScenariosTests {
         }
 
         public static Stream<Arguments> testDivide() {
-            return Stream.of(); //TODO
+            return Stream.of(
+                    Arguments.of("Valid", "div 10 2", Map.of("dividend", 10.0, "divisor", 2.0)),
+                    Arguments.of("Zero Divisor", "div 5 0", null),
+                    Arguments.of("Negative Dividend", "div -8 2", Map.of("dividend", -8.0, "divisor", 2.0)),
+                    Arguments.of("Negative Divisor", "div 10 -2", Map.of("dividend", 10.0, "divisor", -2.0)),
+                    Arguments.of("Not A Number", "div two 3", null),
+                    Arguments.of("Missing Argument", "div 5", null),
+                    Arguments.of("Extraneous Argument", "div 5 3 2", null)
+            );
         };
     }
 
@@ -142,7 +150,14 @@ public class ScenariosTests {
         }
 
         public static Stream<Arguments> testMultiply() {
-            return Stream.of(); //TODO
+            return Stream.of(
+                    Arguments.of("Valid", "mul 5 4", Map.of("multiplicand", 5.0, "multiplier", 4.0)),
+                    Arguments.of("Zero", "mul 0 10", Map.of("multiplicand", 0.0, "multiplier", 10.0)),
+                    Arguments.of("Negative", "mul -3 2", Map.of("multiplicand", -3.0, "multiplier", 2.0)),
+                    Arguments.of("Not A Number", "mul two 3", null),
+                    Arguments.of("Missing Argument", "mul 5", null),
+                    Arguments.of("Extraneous Argument", "mul 5 3 2", null)
+            );
         };
     }
 
