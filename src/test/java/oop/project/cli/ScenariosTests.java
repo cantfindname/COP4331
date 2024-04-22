@@ -35,7 +35,7 @@ public class ScenariosTests {
     }
 
     @Nested
-    class Div {
+    class Sub {
 
         @ParameterizedTest
         @MethodSource
@@ -114,6 +114,78 @@ public class ScenariosTests {
             );
         }
 
+    }
+
+
+    @Nested
+    class Div {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testDivide(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testDivide() {
+            return Stream.of(); //TODO
+        };
+    }
+
+
+    @Nested
+    class Mul {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testMultiply(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testMultiply() {
+            return Stream.of(); //TODO
+        };
+    }
+
+    @Nested
+    class Time {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testTime(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testTime() {
+            return Stream.of(); //TODO
+        };
+    }
+
+    @Nested
+    class Power {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testPower(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testPower() {
+            return Stream.of(); //TODO
+        };
+    }
+
+    @Nested
+    class Factorial {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testFactorial(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testFactorial() {
+            return Stream.of(); //TODO
+        };
     }
 
     private static void test(String command, Object expected) {

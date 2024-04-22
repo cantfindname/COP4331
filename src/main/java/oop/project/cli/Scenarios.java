@@ -46,14 +46,32 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two.
      */
     private static Map<String, Object> add(String arguments) {
-        var split = arguments.split(" ");
-        if (split.length != 2) {
-            throw new IllegalArgumentException("add command requires two arguments: augend and addend");
+        String[] split = arguments.trim().split("\\s+");
+
+        // Check number of arguments
+        if (split.length < 2) {
+            throw new IllegalArgumentException("add command requires exactly two arguments: augend and addend. Only one provided.");
         }
-        int left = Integer.parseInt(split[0]);
-        int right = Integer.parseInt(split[1]);
-        return Map.of("left", left, "right", right);
+        if (split.length > 2) {
+            throw new IllegalArgumentException("add command requires exactly two arguments: augend and addend. Too many provided.");
+        }
+
+        try {
+            int left = Integer.parseInt(split[0]);
+            int right = Integer.parseInt(split[1]);
+            return Map.of("left", left, "right", right);
+
+        } catch (NumberFormatException e) {
+            try {
+                Integer.parseInt(split[0]);
+            } catch (NumberFormatException ex) {
+                throw new IllegalArgumentException("The first argument ('" + split[0] + "') is not a valid integer.");
+            }
+            throw new IllegalArgumentException("The second argument ('" + split[1] + "') is not a valid integer.");
+        }
     }
+
+
     /**
      * Method to subtract two numbers.
      *
@@ -62,35 +80,27 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two.
      */
     static Map<String, Object> sub(String arguments) {
-        Pattern leftPattern = Pattern.compile("--left\\s(\\d+(\\.\\d+)?)");
-        Pattern rightPattern = Pattern.compile("--right\\s(\\d+(\\.\\d+)?$)");
+        Pattern pattern = Pattern.compile("^\\s*(?:--left\\s(\\d+(\\.\\d+)?)\\s*)?--right\\s(\\d+(\\.\\d+)?)\\s*$");
 
-        Matcher leftMatcher = leftPattern.matcher(arguments);
-        Matcher rightMatcher = rightPattern.matcher(arguments);
+        Matcher matcher = pattern.matcher(arguments);
+
+        if (!matcher.matches()) {
+            if (!arguments.contains("--right")) {
+                throw new IllegalArgumentException("Missing mandatory '--right' argument.");
+            }
+            if (arguments.matches(".*\\s--\\w+\\s.*")) {
+                throw new IllegalArgumentException("Invalid or extraneous argument detected.");
+            }
+            throw new IllegalArgumentException("Invalid command format.");
+        }
 
         Map<String, Object> resultMap = new HashMap<>();
+        String leftGroup = matcher.group(1);
+        String rightGroup = matcher.group(3);
 
-        if (!rightMatcher.find()){
-            throw new IllegalArgumentException("Invalid arguments");
-        }
-        String rightGroup = rightMatcher.group(1);
+        resultMap.put("left", leftGroup != null ? Double.parseDouble(leftGroup) : Optional.empty());
+        resultMap.put("right", Double.parseDouble(rightGroup));
 
-
-        if (leftMatcher.find()) {
-            String leftGroup = leftMatcher.group(1);
-            resultMap.put("left", Double.parseDouble(leftGroup));
-        } else {
-            resultMap.put("left", Optional.empty());
-        }
-
-        if (rightGroup != null) {
-            resultMap.put("right", Double.parseDouble(rightGroup));
-        }
-        else {
-            resultMap.put("right", Optional.empty());
-        }
-
-        System.out.println(resultMap);
         return resultMap;
     }
 
@@ -102,10 +112,23 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number is negative.
      */
     static Map<String, Object> sqrt(String arguments) {
-        int number = Integer.parseInt(arguments);
-        if (number < 0) {
-            throw new IllegalArgumentException("sqrt command requires a non-negative integer argument");
+        String[] numbers = arguments.trim().split("\\s+");
+
+        if (numbers.length > 1) {
+            throw new IllegalArgumentException("Sqrt command requires exactly one non-negative integer argument, but multiple were provided.");
         }
+
+        int number;
+        try {
+            number = Integer.parseInt(numbers[0]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input: '" + numbers[0] + "' is not a valid integer.");
+        }
+
+        if (number < 0) {
+            throw new IllegalArgumentException("Sqrt command requires a non-negative integer argument, but received: " + number);
+        }
+
         return Map.of("number", number);
     }
 
@@ -117,10 +140,16 @@ public class Scenarios {
      * @throws IllegalArgumentException if the subcommand is not one of the valid options: add, sub, sqrt, mul, or div.
      */
     static Map<String, Object> calc(String arguments) {
-        if (!Arrays.asList("add", "sub", "sqrt", "mul", "div").contains(arguments)) {
-            throw new IllegalArgumentException("calc command requires one of the subcommands: add, sub, sqrt, mul, or div");
+        String trimmedArgs = arguments.trim();
+        if (trimmedArgs.isEmpty()) {
+            throw new IllegalArgumentException("No subcommand provided. Valid subcommands are: add, sub, sqrt, mul, or div.");
         }
-        return Map.of("subcommand", arguments);
+
+        if (!Arrays.asList("add", "sub", "sqrt", "mul", "div").contains(trimmedArgs)) {
+            throw new IllegalArgumentException("Invalid subcommand '" + trimmedArgs + "'. Valid subcommands are: add, sub, sqrt, mul, or div.");
+        }
+
+        return Map.of("subcommand", trimmedArgs);
     }
 
     /**
@@ -131,11 +160,16 @@ public class Scenarios {
      * @throws IllegalArgumentException if the date is in an invalid format.
      */
     static Map<String, Object> date(String arguments) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
         try {
-            LocalDate date = LocalDate.parse(arguments);
+            LocalDate date = LocalDate.parse(arguments, formatter);
             return Map.of("date", date);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Invalid date format. Date must be in the format yyyy-MM-dd", e);
+            if (!arguments.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                throw new IllegalArgumentException("Invalid date format. Date must strictly follow the yyyy-MM-dd pattern (e.g., 2021-03-15).");
+            }
+            throw new IllegalArgumentException("Invalid date value: " + e.getMessage());
         }
     }
 
@@ -147,17 +181,34 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two or if the divisor is zero.
      */
     static Map<String, Object> divide(String arguments){
-        var split = arguments.split(" ");
+        String[] split = arguments.trim().split("\\s+");
+
         if (split.length != 2) {
-            throw new IllegalArgumentException("div command requires two arguments: dividend and divisor");
+            throw new IllegalArgumentException("Divide command requires exactly two arguments: dividend and divisor.");
         }
-        double left = Double.parseDouble(split[0]);
-        double right = Double.parseDouble(split[1]);
-        if(right == 0){
-           throw new IllegalArgumentException("divisor cannot be zero");
+
+        double left;
+        double right;
+
+        try {
+            left = Double.parseDouble(split[0]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input for dividend: '" + split[0] + "' is not a valid number.");
         }
+
+        try {
+            right = Double.parseDouble(split[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input for divisor: '" + split[1] + "' is not a valid number.");
+        }
+
+        if (right == 0) {
+            throw new IllegalArgumentException("Divisor cannot be zero.");
+        }
+
         return Map.of("dividend", left, "divisor", right);
     }
+
     /**
      * Method to multiply two numbers.
      *
@@ -166,12 +217,27 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two.
      */
     static Map<String, Object> multiply(String arguments) {
-        var split = arguments.split(" ");
+        String[] split = arguments.trim().split("\\s+");
+
         if (split.length != 2) {
-            throw new IllegalArgumentException("mul command requires two arguments: multiplicand and multiplier");
+            throw new IllegalArgumentException("Multiply command requires exactly two arguments: multiplicand and multiplier.");
         }
-        double left = Double.parseDouble(split[0]);
-        double right = Double.parseDouble(split[1]);
+
+        double left;
+        double right;
+
+        try {
+            left = Double.parseDouble(split[0]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input for multiplicand: '" + split[0] + "' is not a valid number.");
+        }
+
+        try {
+            right = Double.parseDouble(split[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input for multiplier: '" + split[1] + "' is not a valid number.");
+        }
+
         return Map.of("multiplicand", left, "multiplier", right);
     }
 
@@ -184,10 +250,15 @@ public class Scenarios {
      */
     static Map<String, Object> time(String timeString) {
         if (!isValidTimeFormat(timeString)) {
-            throw new IllegalArgumentException("Invalid time format. Time must be in the format HH:mm:ss");
+            throw new IllegalArgumentException("Invalid time format. Time must be in the format HH:mm:ss, like '23:59:59'.");
         }
-        LocalTime time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm:ss"));
-        return Map.of("time", time);
+
+        try {
+            LocalTime time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            return Map.of("time", time);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid date value: " + e.getMessage());
+        }
     }
 
     /**
@@ -210,15 +281,31 @@ public class Scenarios {
      * @throws IllegalArgumentException if the number of arguments is not two or if the exponent is negative.
      */
     static Map<String, Object> power(String arguments) {
-        var split = arguments.split(" ");
+        String[] split = arguments.trim().split("\\s+");
+
         if (split.length != 2) {
-            throw new IllegalArgumentException("power command requires two arguments: base and exponent");
+            throw new IllegalArgumentException("Power command requires exactly two arguments: base and exponent.");
         }
-        double base = Double.parseDouble(split[0]);
-        int exponent = Integer.parseInt(split[1]);
+
+        double base;
+        int exponent;
+
+        try {
+            base = Double.parseDouble(split[0]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input for base: '" + split[0] + "' is not a valid number.");
+        }
+
+        try {
+            exponent = Integer.parseInt(split[1]);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid input for exponent: '" + split[1] + "' is not a valid integer.");
+        }
+
         if (exponent < 0) {
-            throw new IllegalArgumentException("exponent cannot be negative for power calculation");
+            throw new IllegalArgumentException("Exponent cannot be negative for power calculation.");
         }
+
         return Map.of("base", base, "exponent", exponent);
     }
 
@@ -232,13 +319,15 @@ public class Scenarios {
     static Map<String, Object> factorial(String arguments) {
         int number;
         try {
-            number = Integer.parseInt(arguments);
+            number = Integer.parseInt(arguments.trim());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("factorial command requires a valid integer argument");
+            throw new IllegalArgumentException("Factorial command requires a valid integer argument.");
         }
+
         if (number < 0) {
-            throw new IllegalArgumentException("factorial command requires a non-negative integer argument");
+            throw new IllegalArgumentException("Factorial command requires a non-negative integer argument.");
         }
+
         long factorial = 1;
         for (int i = 2; i <= number; i++) {
             factorial *= i;
