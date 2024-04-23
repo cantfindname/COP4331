@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -118,9 +119,7 @@ public class ScenariosTests {
                     Arguments.of("Date with leading/trailing spaces", "   date 2024-01-01   ", Map.of("date", LocalDate.of(2024, 1, 1)))
             );
         }
-
     }
-
 
     @Nested
     class Div {

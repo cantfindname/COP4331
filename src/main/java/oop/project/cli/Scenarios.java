@@ -2,6 +2,7 @@ package oop.project.cli;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +19,9 @@ public class Scenarios {
      * @throws IllegalArgumentException if the command base is unknown
      */
     public static Map<String, Object> parse(String command) {
-        var split = command.split(" ", 2);
+        var trimmedCommand = command.trim();
+        var split = trimmedCommand.split(" ", 2);
+
         var base = split[0];
         var arguments = split.length == 2 ? split[1] : "";
         return switch (base) {
@@ -160,10 +163,12 @@ public class Scenarios {
      * @throws IllegalArgumentException if the date is in an invalid format.
      */
     static Map<String, Object> date(String arguments) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        String trimmedDateString = arguments.trim();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
 
         try {
-            LocalDate date = LocalDate.parse(arguments, formatter);
+            LocalDate date = LocalDate.parse(trimmedDateString, formatter);
             return Map.of("date", date);
         } catch (DateTimeParseException e) {
             if (!arguments.matches("\\d{4}-\\d{2}-\\d{2}")) {
@@ -249,12 +254,15 @@ public class Scenarios {
      * @throws IllegalArgumentException if the time is in an invalid format.
      */
     static Map<String, Object> time(String timeString) {
-        if (!isValidTimeFormat(timeString)) {
+
+        String trimmedTimeString = timeString.trim();
+
+        if (!isValidTimeFormat(trimmedTimeString )) {
             throw new IllegalArgumentException("Invalid time format. Time must be in the format HH:mm:ss, like '23:59:59'.");
         }
 
         try {
-            LocalTime time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            LocalTime time = LocalTime.parse(trimmedTimeString , DateTimeFormatter.ofPattern("HH:mm:ss"));
             return Map.of("time", time);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid date value: " + e.getMessage());
