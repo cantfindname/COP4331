@@ -35,6 +35,7 @@ public class Scenarios {
             case "time" -> time(arguments);
             case "pow" -> power(arguments);
             case "fact" -> factorial(arguments);
+            case "log" -> logarithm(arguments);
 
             default -> throw new IllegalArgumentException("Unknown command.");
         };
@@ -345,4 +346,29 @@ public class Scenarios {
         }
         return Map.of("number", number, "factorial", factorial);
     }
+
+    /**
+     * Method to calculate the logarithm of a number.
+     *
+     * @param arguments A string containing a number.
+     * @return A map containing the number and its logarithm.
+     * @throws IllegalArgumentException if the number is negative or not a valid number.
+     */
+    static Map<String, Object> logarithm(String arguments) {
+        double number;
+        try {
+            number = Double.parseDouble(arguments.trim());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Logarithm command requires a valid number argument.");
+        }
+
+        if (number <= 0) {
+            throw new IllegalArgumentException("Logarithm command requires a positive number argument.");
+        }
+
+        double result = Math.log(number);
+
+        return Map.of("number", number, "logarithm", result);
+    }
+
 }

@@ -226,6 +226,26 @@ public class ScenariosTests {
         };
     }
 
+    @Nested
+    class Logarithm {
+
+        @ParameterizedTest
+        @MethodSource
+        public void testLogarithm(String name, String command, Object expected) {
+            test(command, expected);
+        }
+
+        public static Stream<Arguments> testLogarithm() {
+            return Stream.of(
+                    Arguments.of("Valid", "log 10", Map.of("number", 10.0, "logarithm", Math.log(10))),
+                    Arguments.of("Zero", "log 0", null),
+                    Arguments.of("Negative", "log -5", null),
+                    Arguments.of("Not A Number", "log abc", null)
+            );
+        }
+
+    }
+
     private static void test(String command, Object expected) {
         if (expected != null) {
             var result = Scenarios.parse(command);
@@ -238,5 +258,6 @@ public class ScenariosTests {
             });
         }
     }
+
 
 }
