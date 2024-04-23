@@ -46,7 +46,7 @@ public class Scenarios {
      *
      * @param arguments A string containing two numbers separated by a space.
      * @return A map containing the augend and addend.
-     * @throws IllegalArgumentException if the number of arguments is not two.
+     * @throws IllegalArgumentException if the number of arguments is not two or if either of the arguments are not a valid integer
      */
     private static Map<String, Object> add(String arguments) {
         String[] split = arguments.trim().split("\\s+");
@@ -80,7 +80,7 @@ public class Scenarios {
      *
      * @param arguments A string containing two numbers separated by a space.
      * @return A map containing the minuend and subtrahend.
-     * @throws IllegalArgumentException if the number of arguments is not two.
+     * @throws IllegalArgumentException if the number of arguments is not two, not in a valid format, if the arguments are not valid numbers.
      */
     static Map<String, Object> sub(String arguments) {
         Pattern pattern = Pattern.compile("^\\s*(?:--left\\s(\\d+(\\.\\d+)?)\\s*)?--right\\s(\\d+(\\.\\d+)?)\\s*$");
@@ -112,11 +112,13 @@ public class Scenarios {
      *
      * @param arguments A string representing the number to calculate the square root of.
      * @return A map containing the number.
-     * @throws IllegalArgumentException if the number is negative.
+     * @throws IllegalArgumentException if there are too many arguments, no arguments, or the argument is negative/not a valid integer.
      */
     static Map<String, Object> sqrt(String arguments) {
         String[] numbers = arguments.trim().split("\\s+");
-
+        if (numbers.length == 0) {
+            throw new IllegalArgumentException("Sqrt command requires exactly one non-negative integer argument, but none were provided.");
+        }
         if (numbers.length > 1) {
             throw new IllegalArgumentException("Sqrt command requires exactly one non-negative integer argument, but multiple were provided.");
         }
@@ -140,7 +142,7 @@ public class Scenarios {
      *
      * @param arguments A string representing the subcommand.
      * @return A map containing the subcommand as the "subcommand" key.
-     * @throws IllegalArgumentException if the subcommand is not one of the valid options: add, sub, sqrt, mul, or div.
+     * @throws IllegalArgumentException if no subcommand is provided or the subcommand is not one of the valid options: add, sub, sqrt, mul, or div.
      */
     static Map<String, Object> calc(String arguments) {
         String trimmedArgs = arguments.trim();
@@ -160,7 +162,7 @@ public class Scenarios {
      *
      * @param arguments A string representing the date to parse.
      * @return A map containing the parsed date as the "date" key.
-     * @throws IllegalArgumentException if the date is in an invalid format.
+     * @throws IllegalArgumentException if the date is in an invalid format or the date has an invalid value.
      */
     static Map<String, Object> date(String arguments) {
 
@@ -183,7 +185,7 @@ public class Scenarios {
      *
      * @param arguments A string containing two numbers separated by a space.
      * @return A map containing the dividend and divisor.
-     * @throws IllegalArgumentException if the number of arguments is not two or if the divisor is zero.
+     * @throws IllegalArgumentException if the number of arguments is not two, the divisor is 0, the divisor is not valid, or if the dividend is not valid.
      */
     static Map<String, Object> divide(String arguments){
         String[] split = arguments.trim().split("\\s+");
@@ -219,7 +221,7 @@ public class Scenarios {
      *
      * @param arguments A string containing two numbers separated by a space.
      * @return A map containing the multiplicand and multiplier.
-     * @throws IllegalArgumentException if the number of arguments is not two.
+     * @throws IllegalArgumentException if the number of arguments is not two, or if either of the arguments are not valid numbers.
      */
     static Map<String, Object> multiply(String arguments) {
         String[] split = arguments.trim().split("\\s+");
@@ -251,7 +253,7 @@ public class Scenarios {
      *
      * @param timeString A string representing the time to parse.
      * @return A map containing the parsed time as the "time" key.
-     * @throws IllegalArgumentException if the time is in an invalid format.
+     * @throws IllegalArgumentException if the time is in an invalid format or the time has an invalid value.
      */
     static Map<String, Object> time(String timeString) {
 
@@ -275,6 +277,7 @@ public class Scenarios {
      * @param timeString A string representing the time in the format HH:mm:ss.
      * @return true if the time string is in the valid format, false otherwise.
      */
+
     static boolean isValidTimeFormat(String timeString) {
         String expectedFormat = "\\d{2}:\\d{2}:\\d{2}";
 
@@ -286,7 +289,7 @@ public class Scenarios {
      *
      * @param arguments A string containing two numbers separated by a space.
      * @return A map containing the base and exponent.
-     * @throws IllegalArgumentException if the number of arguments is not two or if the exponent is negative.
+     * @throws IllegalArgumentException if the number of arguments is not two, if the exponent is negative, or if either the base or exponent is not valid.
      */
     static Map<String, Object> power(String arguments) {
         String[] split = arguments.trim().split("\\s+");
@@ -322,7 +325,7 @@ public class Scenarios {
      *
      * @param arguments A string containing a number.
      * @return A map containing the number and its factorial.
-     * @throws IllegalArgumentException if the number is negative.
+     * @throws IllegalArgumentException if the number is negative or not a valid integer.
      */
     static Map<String, Object> factorial(String arguments) {
         int number;
